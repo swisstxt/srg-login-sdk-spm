@@ -1,6 +1,6 @@
-# SRG Login SDK — Swift Package Manager
+# SRG Login SDK — Apple Distribution
 
-![Latest Version](https://img.shields.io/github/v/tag/swisstxt/srg-login-sdk-spm?label=latest&color=blue)
+![Latest Version](https://img.shields.io/github/v/tag/swisstxt/srg-login-sdk-distribution-apple?label=latest&color=blue)
 
 ## Integration
 
@@ -8,7 +8,7 @@
 
 File → Add Package Dependencies → enter this repository URL:
 ```
-https://github.com/swisstxt/srg-login-sdk-spm
+https://github.com/swisstxt/srg-login-sdk-distribution-apple
 ```
 
 Select **Up to Next Major Version** for stable releases, or **Exact Version** for pre-releases (beta/RC).
@@ -18,7 +18,7 @@ Select **Up to Next Major Version** for stable releases, or **Exact Version** fo
 ```swift
 dependencies: [
     .package(
-        url: "https://github.com/swisstxt/srg-login-sdk-spm",
+        url: "https://github.com/swisstxt/srg-login-sdk-distribution-apple",
         from: "1.0.0"
     )
 ]
@@ -29,7 +29,7 @@ dependencies: [
 ```swift
 dependencies: [
     .package(
-        url: "https://github.com/swisstxt/srg-login-sdk-spm",
+        url: "https://github.com/swisstxt/srg-login-sdk-distribution-apple",
         exact: "1.0.0-beta.6"
     )
 ]
@@ -41,7 +41,7 @@ Then add the product to your target:
 .target(
     name: "YourTarget",
     dependencies: [
-        .product(name: "SRGLoginSDK", package: "srg-login-sdk-spm")
+        .product(name: "SRGLoginSDK", package: "SRGLoginSDK")
     ]
 )
 ```
@@ -233,7 +233,7 @@ The [srg-login-sdk-sample-ios](https://github.com/swisstxt/srg-login-sdk-sample-
 
 ## Releases
 
-All releases and changelogs are on the [Releases page](https://github.com/swisstxt/srg-login-sdk-spm/releases).
+All releases and changelogs are on the [Releases page](https://github.com/swisstxt/srg-login-sdk-distribution-apple/releases).
 
 ---
 
