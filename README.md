@@ -30,7 +30,7 @@ dependencies: [
 dependencies: [
     .package(
         url: "https://github.com/swisstxt/srg-login-sdk-distribution-apple",
-        exact: "1.0.0-beta.6"
+        exact: "1.0.0-beta.12"
     )
 ]
 ```
@@ -111,8 +111,8 @@ let config = SrgLoginConfig(
         businessUnit: "SRF",
         businessUnitName: "Schweizer Radio und Fernsehen"
     ),
-    postLogoutRedirectUri: "your-app-scheme://logoutSuccess",
-    environment: .prod
+    environment: .prod,
+    postLogoutRedirectUri: "your-app-scheme://logoutSuccess"
 )
 
 let srgLogin = SrgLoginSdk.shared.create(config: config)
@@ -136,14 +136,25 @@ class AuthContextProvider: NSObject, ASWebAuthenticationPresentationContextProvi
 }
 
 let authContext = iOSAuthContext(presentationContextProvider: authContextProvider)
-let result = try await srgLogin.login(credentials: Credentials.Web(authContext: authContext))
 
-if let success = result as? SdkResultSuccess<TokenSet>, let tokenSet = success.data {
-    // User is authenticated — store or use tokenSet as needed
-}
+let loginFlow = srgLogin.login(
+    loginMethod: LoginMethod.Web.shared,
+    authContext: authContext,
+    additionalScopes: ["profile", "email", "offline_access"],
+    additionalParameters: [:]
+)
 
-if let failure = result as? SdkResultFailure {
-    print(failure.error)
+for await state in SkieSwiftFlow<LoginState>(loginFlow) {
+    guard !Task.isCancelled else { break }
+    if let success = state as? LoginState.Success {
+        // User is authenticated — tokenSet is in success.tokenSet
+        break
+    }
+    if let failure = state as? LoginState.Failure {
+        if failure.error is SrgLoginError.UserCancelled { break }
+        print(failure.error)
+        break
+    }
 }
 ```
 
@@ -189,14 +200,19 @@ if let failure = result as? SdkResultFailure {
 
 ```swift
 let authContext = iOSAuthContext(presentationContextProvider: authContextProvider)
-let frontChannel = LogoutType.FrontChannel()
-try await srgLogin.logout(logoutType: frontChannel, authContext: authContext)
+let frontChannel = LogoutType.FrontChannel(
+    authContext: authContext,
+    onReturn: { returnUrl in
+        print("Logout returned via deeplink: \(returnUrl)")
+    }
+)
+let result = try await srgLogin.logout(logoutType: frontChannel)
 ```
 
 **Local-only logout** — clears local tokens only, without contacting the server:
 
 ```swift
-try await srgLogin.logout(method: LogoutMethod.LocalOnly())
+try await srgLogin.logout(logoutType: LogoutType.LocalOnly.shared)
 ```
 
 ### SSO — open a URL with the user's active session
